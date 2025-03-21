@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/Pochacco.png" type="image/x-icon">
+    <title>Flowers</title>
+</head>
+
+<body class="container">
+    <audio id="miCancion" src="sound/AmorMio.mp3" loop></audio>
+    <div id="content">
+        <!-- Aquí se cargará el contenido de las otras páginas -->
+    </div>
+
+    <script>
+        const audio = document.getElementById('miCancion');
+
+        // Reproducir la música si no está ya reproduciéndose
+        if (localStorage.getItem('musicPlaying') === 'true') {
+            audio.play().catch((error) => {
+                console.error('Error al intentar reproducir el audio:', error);
+            });
+        }
+
+        // Almacenar el estado de la música
+        audio.addEventListener('play', () => {
+            localStorage.setItem('musicPlaying', 'true');
+        });
+
+        audio.addEventListener('pause', () => {
+            localStorage.setItem('musicPlaying', 'false');
+        });
+
+        // Función para cargar contenido dinámicamente
+        function loadPage(page) {
+            fetch(page)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('content').innerHTML = data;
+                })
+                .catch(error => console.error('Error al cargar la página:', error));
+        }
+
+        // Cargar la página inicial
+        loadPage('indexContent.html'); // Carga el contenido inicial
+    </script>
+   
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomeScreen = document.getElementById('welcome');
+            const sceneScreen = document.getElementById('scene');
+            const enterBtn = document.getElementById('enterBtn');
+            const backBtn = document.getElementById('backBtn');
+            const sceneContainer = document.querySelector('.scene-container');
+            const welcomeFlowers = document.getElementById('welcomeFlowers');
+
+            // Crear chispas en la pantalla de bienvenida
+            createSparkles();
+
+            // Función para crear chispas
+            function createSparkles() {
+                const sparkleCount = 20;
+
+                for (let i = 0; i < sparkleCount; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.classList.add('sparkle');
+
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    const delay = Math.random() * 3;
+                    const size = 8 + Math.random() * 15;
+
+                    sparkle.style.left = `${x}px`;
+                    sparkle.style.top = `${y}px`;
+                    sparkle.style.width = `${size}px`;
+                    sparkle.style.height = `${size}px`;
+                    sparkle.style.animationDelay = `${delay}s`;
+
+                    document.body.appendChild(sparkle); // Agregar al body para que se muestre
+                }
+            }
+
+            // Función para crear y animar corazones cayendo
+            function createHearts() {
+                const heartColors = ['#FF66B2', '#FF9ECD', '#FF3385', '#FF0066'];
+
+                // Función para crear un corazón
+                function createHeart() {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+
+                    const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+                    const x = Math.random() * window.innerWidth;
+                    const duration = 5 + Math.random() * 5;
+                    const size = 15 + Math.random() * 25;
+
+                    heart.style.left = `${x}px`;
+                    heart.style.width = `${size}px`;
+                    heart.style.height = `${size}px`;
+                    heart.style.animationDuration = `${duration}s`;
+                    heart.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 90 C100 30 120 10 50 40 C-20 10 0 30 50 90" fill="${randomColor}" /></svg>')`;
+                    heart.style.backgroundSize = 'cover';
+
+                    document.body.appendChild(heart); // Agregar al body para que se muestre
+
+                    // Eliminar el corazón después de la animación
+                    setTimeout(() => {
+                        heart.remove();
+                    }, duration * 1000);
+                }
+
+                // Crear corazones periódicamente
+                const heartInterval = setInterval(() => {
+                    createHeart();
+                }, 300);
+            }
+
+            // Llama a la función para crear corazones cuando se muestre la escena
+            enterBtn.addEventListener('click', function() {
+                createHearts();
+            });
+        });
+    </script>
+</body>
+
+</html>
