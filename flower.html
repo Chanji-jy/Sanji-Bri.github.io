@@ -324,55 +324,82 @@
       </div>
     </div>
     <script>
+      // Función para cargar contenido dinámicamente
+      function loadPage(page) {
+          fetch(page)
+              .then(response => response.text())
+              .then(data => {
+                  document.getElementById('content').innerHTML = data;
+              })
+              .catch(error => console.error('Error al cargar la página:', error));
+      }
+
+      // Cargar la página inicial
+      loadPage('indexContent.html'); // Carga el contenido inicial
+      
+      // Nuevo código para manejar el audio
       document.addEventListener('DOMContentLoaded', function() {
-            const audio = document.getElementById('miCancion');
-
-            // Verifica si el audio se ha encontrado
-            if (!audio) {
-                console.error('El elemento de audio no se encontró.');
-                return; // Salir si no se encuentra el audio
-            }
-
-            // Reproducir la música si no está ya reproduciéndose
-            if (localStorage.getItem('musicPlaying') === 'true') {
-                audio.play().catch((error) => {
-                    console.error('Error al intentar reproducir el audio:', error);
-                });
-            }
-
-            // Almacenar el estado de la música
-            audio.addEventListener('play', () => {
-                localStorage.setItem('musicPlaying', 'true');
-            });
-
-            audio.addEventListener('pause', () => {
-                localStorage.setItem('musicPlaying', 'false');
-            });
-
-            audio.addEventListener('error', (e) => {
-                console.error('Error al reproducir el audio:', e);
-            });
-        });
-
-        function playAudio() {
-            const audio = document.getElementById('miCancion');
-            audio.play().catch((error) => {
-                console.error('Error al intentar reproducir el audio:', error);
-            });
-        }
-    </script>
-    <script>
+          const audio = document.getElementById('miCancion');
+          
+          // Intentar reproducir automáticamente, pero con un evento de interacción del usuario
+          const playAudio = function() {
+              audio.play().then(() => {
+                  console.log('Audio reproduciendo correctamente');
+                  // Remover todos los listeners una vez reproducido
+                  document.removeEventListener('click', playAudio);
+                  document.removeEventListener('touchstart', playAudio);
+                  document.removeEventListener('keydown', playAudio);
+              }).catch(error => {
+                  console.error('No se pudo reproducir el audio:', error);
+              });
+          };
+          
+          // Añadir múltiples listeners para maximizar posibilidades de reproducción
+          document.addEventListener('click', playAudio);
+          document.addEventListener('touchstart', playAudio);
+          document.addEventListener('keydown', playAudio);
+          
+          // También añadir un botón visible como respaldo
+          const audioButton = document.createElement('button');
+          audioButton.textContent = '🎵';
+          audioButton.style.position = 'fixed';
+          audioButton.style.bottom = '10px';
+          audioButton.style.right = '10px';
+          audioButton.style.zIndex = '9999';
+          audioButton.style.padding = '10px';
+          audioButton.style.borderRadius = '50%';
+          audioButton.style.background = '#ff69b4';
+          audioButton.style.border = 'none';
+          audioButton.style.cursor = 'pointer';
+          
+          audioButton.addEventListener('click', function() {
+              playAudio();
+              // Opcional: ocultar el botón después de usarlo
+              this.style.display = 'none';
+          });
+          
+          document.body.appendChild(audioButton);
+      });
+  </script>
+ 
+  <script>
       document.addEventListener('DOMContentLoaded', function() {
-          const welcomeScreen = document.getElementById('welcome');
-          const sceneScreen = document.getElementById('scene');
-          const enterBtn = document.getElementById('enterBtn');
-          const backBtn = document.getElementById('backBtn');
-          const sceneContainer = document.querySelector('.scene-container');
-          const welcomeFlowers = document.getElementById('welcomeFlowers');
-
-          // Crear chispas en la pantalla de bienvenida
-          createSparkles();
-
+          // Esperar a que el contenido se cargue
+          setTimeout(function() {
+              const sceneElement = document.getElementById('scene');
+              const buttonElement = document.querySelector('.botones');
+              
+              // Crear chispas en la pantalla
+              createSparkles();
+              
+              // Si existe el botón, añadir el evento
+              if (buttonElement) {
+                  buttonElement.addEventListener('click', function() {
+                      createHearts();
+                  });
+              }
+          }, 500); // Pequeño retraso para asegurar que el contenido está cargado
+          
           // Función para crear chispas
           function createSparkles() {
               const sparkleCount = 20;
@@ -392,7 +419,7 @@
                   sparkle.style.height = `${size}px`;
                   sparkle.style.animationDelay = `${delay}s`;
 
-                  document.body.appendChild(sparkle); // Agregar al body para que se muestre
+                  document.body.appendChild(sparkle);
               }
           }
 
@@ -417,7 +444,7 @@
                   heart.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M50 90 C100 30 120 10 50 40 C-20 10 0 30 50 90" fill="${randomColor}" /></svg>')`;
                   heart.style.backgroundSize = 'cover';
 
-                  document.body.appendChild(heart); // Agregar al body para que se muestre
+                  document.body.appendChild(heart);
 
                   // Eliminar el corazón después de la animación
                   setTimeout(() => {
@@ -429,12 +456,13 @@
               const heartInterval = setInterval(() => {
                   createHeart();
               }, 300);
+              
+              // Opcional: detener los corazones después de un tiempo
+              setTimeout(() => {
+                  clearInterval(heartInterval);
+              }, 10000); // 10 segundos
           }
-
-          // Llama a la función para crear corazones cuando se muestre la escena
-          enterBtn.addEventListener('click', function() {
-              createHearts();
-          });
+          
       });
   </script>
     <script src="anim.js"></script>
